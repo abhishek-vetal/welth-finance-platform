@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
       className={`${inter.className}`}
     >
       <body>
-        <ClerkProvider>
+        <ClerkProvider >
           <header>
             <Header />
           </header>
