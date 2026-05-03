@@ -8,10 +8,10 @@ import { FaPenToSquare } from "react-icons/fa6";
 
 export default function Header() {
     return (
-      <div className='fixed top-0 w-full bg-white/80 backdrop-blur-md border-b-2'>
+      <div className='fixed top-0 w-full bg-white/80 backdrop-blur-md border-b-2 z-50'>
         <nav className='px-14 py-4 flex justify-between items-center'>
           <Link href='/'>
-            <Image src={"/logo.png"} alt='welth logo' width={100} height={30} />
+            <Image src={"/logo.png"} alt='welth logo' width={100} height={50} />
           </Link>
 
           <div className='w-35 flex gap-3 justify-end px-2'>

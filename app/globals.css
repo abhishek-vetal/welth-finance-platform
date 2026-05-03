@@ -126,3 +126,15 @@
     @apply font-sans;
     }
 }
+
+@layer utilities {
+  .gradient {
+    @apply bg-gradient-to-tl from-slate-800 via-violet-500 to-zinc-400 bg-clip-text 
+    text-transparent pb-2 px-1
+  }
+}
+
+.hero-image-div {
+  transition: transform 0.5s ease;
+  transform: perspective(1000px) rotateX(15deg);
+}

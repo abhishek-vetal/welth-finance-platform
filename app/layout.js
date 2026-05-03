@@ -24,7 +24,7 @@ export default function RootLayout({ children }) {
             <Header />
           </header>
 
-          <main className="min-h-screen">{children}</main>
+          <main className="min-h-screen mt-20">{children}</main>
           
           <footer>
             <div className="py-12 bg-blue-50 text-center text-gray-600">
