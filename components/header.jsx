@@ -33,10 +33,10 @@ export default function Header() {
 
             <Show when="signed-out">
               <SignInButton>
-                <Button variant='outline'>Login</Button>
+                <Button variant='outline' size="lg">Login</Button>
               </SignInButton>
               <SignUpButton>
-                <Button variant='outline'>Sign-up</Button>
+                <Button variant='outline' size="lg">Sign-up</Button>
               </SignUpButton>
             </Show>
 
