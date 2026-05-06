@@ -1,11 +1,9 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
-import { ClerkProvider } from '@clerk/nextjs'
+import { ClerkProvider } from "@clerk/nextjs";
 
-const inter = Inter({
-  subsets: ['latin']
-})
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Welth",
@@ -14,25 +12,24 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      className={`${inter.className}`}
-    >
-      <body>
-        <ClerkProvider >
-          <header>
+    <html lang="en" className={inter.className}>
+      <ClerkProvider>
+        <body className="flex flex-col min-h-screen">
+            
             <Header />
-          </header>
 
-          <main className="min-h-screen mt-20">{children}</main>
-          
-          <footer>
-            <div className="py-12 bg-blue-50 text-center text-gray-600">
-              <p>Made with ❤️ by Abhishek</p>
-            </div>
-          </footer>
-        </ClerkProvider>
-      </body>
+            <main className="grow">
+              {children}
+            </main>
+
+            <footer>
+              <div className="py-12 bg-blue-50 text-center text-gray-600">
+                <p>Made with ❤️ by Abhishek</p>
+              </div>
+            </footer>
+
+        </body>
+      </ClerkProvider>
     </html>
   );
 }
