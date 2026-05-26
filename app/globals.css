@@ -2,10 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-html {
-  scroll-behavior: auto;
-}
-
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: var(--font-sans);
@@ -133,7 +129,7 @@ html {
 @layer utilities {
   .gradient {
     @apply bg-linear-to-tl from-slate-800 via-violet-500 to-zinc-400 bg-clip-text 
-    text-transparent pb-2 px-1
+    text-transparent w-fit
   }
 }
 

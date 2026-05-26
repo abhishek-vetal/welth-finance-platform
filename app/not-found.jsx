@@ -5,7 +5,7 @@ export default function NotFound() {
     <div className="min-h-screen justify-center flex items-center bg-white px-6">
 
       <div className="text-center max-w-lg">
-        
+
         {/* 404 Text */}
         <h1 className="text-[120px] font-extrabold tracking-tight bg-linear-to-r from-gray-900 via-gray-700 to-gray-500 text-transparent bg-clip-text">
           404
@@ -18,7 +18,7 @@ export default function NotFound() {
 
         {/* Description */}
         <p className="text-gray-500 mt-3 leading-relaxed">
-          The page you’re looking for doesn’t exist or has been moved.  
+          The page you’re looking for doesn’t exist or has been moved.
           Let’s get you back on track.
         </p>
 

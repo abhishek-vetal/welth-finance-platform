@@ -1,5 +1,5 @@
 export default function MainLayout({ children }) {
     return ( 
-        <div>{children}</div>
+        <div className="pt-25">{children}</div>
     )
 }

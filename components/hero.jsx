@@ -28,7 +28,7 @@ export default function Hero() {
 
   return (
     <div className="container mx-auto px-4 pt-20 md:px-6 flex flex-col items-center text-center">
-      <h1 className="gradient text-5xl md:text-[110px] font-bold mt-10 tracking-tight">
+      <h1 className="gradient text-5xl md:text-[110px] font-bold mt-10 pb-2.5 tracking-tight drop-shadow-sm">
         Manage Your Finances <br /> With Intelligence
       </h1>
 
@@ -40,7 +40,7 @@ export default function Hero() {
       <Link href={"/dashboard"}>
         <Button
           size="lg"
-          className="px-8 py-5 mt-4 shadow-lg transition-all duration-300 hover:bg-violet-800 hover:scale-105 hover:shadow-xl"
+          className="px-8 py-5 mt-5 shadow-lg transition-all duration-300 hover:bg-violet-800 hover:scale-105 hover:shadow-xl"
         >
           Get Started
         </Button>
