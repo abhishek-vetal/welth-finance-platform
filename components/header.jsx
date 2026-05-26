@@ -7,21 +7,14 @@ import { FaPenToSquare } from "react-icons/fa6";
 
 export default function Header() {
   return (
-    <header className="container mx-auto fixed top-0 left-0 right-0 w-full bg-white/80 backdrop-blur-md border-b z-50">
+    <header className="fixed top-0 left-0 right-0 w-full bg-white/80 backdrop-blur-md border-b z-50">
 
       <div className="px-4 md:px-6">
         <nav className="flex items-center justify-between py-4">
 
           {/* Logo */}
           <Link href="/">
-            <Image
-              src="/welth.png"
-              alt="welth logo"
-              width={100}
-              height={50}
-              priority // <-- This fixes the LCP (Largest Contentful Paint) warning
-              className="h-10 w-auto"
-            />
+            <Image src="/logo.png" alt="welth logo" width={100} height={50} />
           </Link>
 
           {/* Right side */}
