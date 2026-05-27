@@ -25,219 +25,134 @@ export default function EmailTemplate({
     dashboardUrl: data?.dashboardUrl || "#",
   };
 
-  const remainingAmount =
-    safeData.budgetAmount - safeData.totalExpenses;
+  const remainingAmount = safeData.budgetAmount - safeData.totalExpenses;
 
   const isOverBudget = remainingAmount < 0;
 
   if (type === "monthly-report") {
-    const net =
-      data?.stats?.totalIncome -
-      data?.stats?.totalExpenses;
+    const net = data?.stats?.totalIncome - data?.stats?.totalExpenses;
 
     return (
       <Html>
         <Head />
-        <Preview>
-          Your Monthly Financial Summary
-        </Preview>
+        <Preview>Your Monthly Financial Summary</Preview>
 
         <Body style={styles.body}>
           <Container style={styles.container}>
-
             {/* Header */}
 
             <Section style={styles.header}>
-              <Text style={styles.logo}>
-                WELTH
-              </Text>
+              <Text style={styles.logo}>WELTH</Text>
 
-              <Text style={styles.subtitle}>
-                Monthly Financial Report
-              </Text>
+              <Text style={styles.subtitle}>Monthly Financial Report</Text>
             </Section>
 
             {/* Main Content */}
 
             <Section style={styles.content}>
+              <Text style={styles.date}>{data?.month}</Text>
 
-              <Text style={styles.date}>
-                {data?.month}
-              </Text>
+              <Heading style={styles.title}>Monthly Financial Summary</Heading>
 
-              <Heading style={styles.title}>
-                Monthly Financial Summary
-              </Heading>
+              <Text style={styles.text}>Hello {userName},</Text>
 
               <Text style={styles.text}>
-                Hello {userName},
-              </Text>
-
-              <Text style={styles.text}>
-                Here is a summary of your financial
-                activity for {data?.month}. Review
-                your spending trends and insights
-                below.
+                Here is a summary of your financial activity for {data?.month}.
+                Review your spending trends and insights below.
               </Text>
 
               {/* Summary Metrics */}
 
               <Section style={styles.reportCard}>
-
                 <Row>
-
                   <Column>
-                    <Text style={styles.metricLabel}>
-                      Total Income
-                    </Text>
+                    <Text style={styles.metricLabel}>Total Income</Text>
 
-                    <Text
-                      style={styles.incomeValue}
-                    >
-                      ₹
-                      {data?.stats?.totalIncome?.toLocaleString()}
+                    <Text style={styles.incomeValue}>
+                      ₹{data?.stats?.totalIncome?.toLocaleString()}
                     </Text>
                   </Column>
 
                   <Column>
-                    <Text style={styles.metricLabel}>
-                      Total Expenses
-                    </Text>
+                    <Text style={styles.metricLabel}>Total Expenses</Text>
 
-                    <Text
-                      style={styles.expenseValue}
-                    >
-                      ₹
-                      {data?.stats?.totalExpenses?.toLocaleString()}
+                    <Text style={styles.expenseValue}>
+                      ₹{data?.stats?.totalExpenses?.toLocaleString()}
                     </Text>
                   </Column>
-
                 </Row>
 
                 <Hr style={styles.hr} />
 
                 <Row>
-
                   <Column>
-                    <Text style={styles.metricLabel}>
-                      Net Balance
-                    </Text>
+                    <Text style={styles.metricLabel}>Net Balance</Text>
 
                     <Text
-                      style={
-                        net >= 0
-                          ? styles.incomeValue
-                          : styles.dangerValue
-                      }
+                      style={net >= 0 ? styles.incomeValue : styles.dangerValue}
                     >
-                      ₹
-                      {net?.toLocaleString()}
+                      ₹{net?.toLocaleString()}
                     </Text>
                   </Column>
-
                 </Row>
-
               </Section>
 
               {/* Category Breakdown */}
 
               {data?.stats?.byCategory && (
-                <Section
-                  style={styles.reportCard}
-                >
-
-                  <Heading
-                    style={styles.sectionHeading}
-                  >
+                <Section style={styles.reportCard}>
+                  <Heading style={styles.sectionHeading}>
                     Expense Breakdown
                   </Heading>
 
-                  {Object.entries(
-                    data.stats.byCategory
-                  ).map(
+                  {Object.entries(data.stats.byCategory).map(
                     ([category, amount]) => (
-
-                      <Row
-                        key={category}
-                        style={styles.categoryRow}
-                      >
-
+                      <Row key={category} style={styles.categoryRow}>
                         <Column>
-                          <Text
-                            style={styles.categoryName}
-                          >
-                            {category}
-                          </Text>
+                          <Text style={styles.categoryName}>{category}</Text>
                         </Column>
 
                         <Column align="right">
-                          <Text
-                            style={styles.categoryAmount}
-                          >
-                            ₹
-                            {Number(
-                              amount
-                            ).toLocaleString()}
+                          <Text style={styles.categoryAmount}>
+                            ₹{Number(amount).toLocaleString()}
                           </Text>
                         </Column>
-
                       </Row>
-                    )
+                    ),
                   )}
-
                 </Section>
               )}
 
               {/* AI Insights */}
 
               {data?.insights?.length > 0 && (
-                <Section
-                  style={styles.reportCard}
-                >
-
-                  <Heading
-                    style={styles.sectionHeading}
-                  >
+                <Section style={styles.reportCard}>
+                  <Heading style={styles.sectionHeading}>
                     Welth Insights
                   </Heading>
 
-                  {data.insights.map(
-                    (insight, index) => (
-                      <Text
-                        key={index}
-                        style={styles.insight}
-                      >
-                        • {insight}
-                      </Text>
-                    )
-                  )}
-
+                  {data.insights.map((insight, index) => (
+                    <Text key={index} style={styles.insight}>
+                      • {insight}
+                    </Text>
+                  ))}
                 </Section>
               )}
 
-              <Section
-                style={styles.buttonContainer}
-              >
-                <a
-                  href={data?.dashboardUrl}
-                  style={styles.button}
-                >
+              <Section style={styles.buttonContainer}>
+                <a href={data?.dashboardUrl} style={styles.button}>
                   Open Dashboard
                 </a>
               </Section>
-
             </Section>
 
             <Section style={styles.footer}>
-              <Text style={styles.footerText}>
-                Thank you for using Welth.
-              </Text>
+              <Text style={styles.footerText}>Thank you for using Welth.</Text>
 
               <Text style={styles.footerText}>
                 © {new Date().getFullYear()} Welth
               </Text>
             </Section>
-
           </Container>
         </Body>
       </Html>
@@ -249,18 +164,13 @@ export default function EmailTemplate({
     <Html>
       <Head />
 
-      <Preview>
-        Budget utilization update for your account
-      </Preview>
+      <Preview>Budget utilization update for your account</Preview>
 
       <Body style={styles.body}>
         <Container style={styles.container}>
-
           {/* Header */}
           <Section style={styles.header}>
-            <Text style={styles.logo}>
-              WELTH
-            </Text>
+            <Text style={styles.logo}>WELTH</Text>
 
             <Text style={styles.subtitle}>
               Personal Financial Management Platform
@@ -270,70 +180,46 @@ export default function EmailTemplate({
           {/* Main Content */}
           <Section style={styles.content}>
             <Text style={styles.date}>
-              {new Date().toLocaleDateString(
-                "en-US",
-                {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                }
-              )}
+              {new Date().toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
             </Text>
 
-            <Heading style={styles.title}>
-              Budget Utilization Alert
-            </Heading>
+            <Heading style={styles.title}>Budget Utilization Alert</Heading>
+
+            <Text style={styles.text}>Hello {userName},</Text>
 
             <Text style={styles.text}>
-              Hello {userName},
-            </Text>
-
-            <Text style={styles.text}>
-              This is an automated update regarding
-              your monthly budget activity. Your
-              current budget utilization has reached{" "}
-              <strong>
-                {safeData.percentageUsed.toFixed(
-                  1
-                )}
-                %
-              </strong>.
+              This is an automated update regarding your monthly budget
+              activity. Your current budget utilization has reached{" "}
+              <strong>{safeData.percentageUsed.toFixed(1)}%</strong>.
             </Text>
 
             {/* Financial Summary Card */}
 
             <Section style={styles.metricCard}>
-
               <Row>
                 <Column>
-                  <Text style={styles.metricLabel}>
-                    Allocated Budget
-                  </Text>
+                  <Text style={styles.metricLabel}>Allocated Budget</Text>
 
                   <Text style={styles.metricValue}>
                     ₹
-                    {safeData.budgetAmount.toLocaleString(
-                      undefined,
-                      {
-                        minimumFractionDigits: 2,
-                      }
-                    )}
+                    {safeData.budgetAmount.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
                   </Text>
                 </Column>
 
                 <Column>
-                  <Text style={styles.metricLabel}>
-                    Current Expenses
-                  </Text>
+                  <Text style={styles.metricLabel}>Current Expenses</Text>
 
                   <Text style={styles.metricValue}>
                     ₹
-                    {safeData.totalExpenses.toLocaleString(
-                      undefined,
-                      {
-                        minimumFractionDigits: 2,
-                      }
-                    )}
+                    {safeData.totalExpenses.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
                   </Text>
                 </Column>
               </Row>
@@ -342,66 +228,43 @@ export default function EmailTemplate({
 
               <Row>
                 <Column>
-
-                  <Text style={styles.metricLabel}>
-                    Remaining Balance
-                  </Text>
+                  <Text style={styles.metricLabel}>Remaining Balance</Text>
 
                   <Text
                     style={
-                      isOverBudget
-                        ? styles.dangerValue
-                        : styles.metricValue
+                      isOverBudget ? styles.dangerValue : styles.metricValue
                     }
                   >
                     ₹
-                    {Math.abs(
-                      remainingAmount
-                    ).toLocaleString(
-                      undefined,
-                      {
-                        minimumFractionDigits: 2,
-                      }
-                    )}
-
-                    {isOverBudget &&
-                      " deficit"}
+                    {Math.abs(remainingAmount).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
+                    {isOverBudget && " deficit"}
                   </Text>
-
                 </Column>
               </Row>
-
             </Section>
 
             <Text style={styles.text}>
-              We recommend reviewing your
-              recent transaction activity and
-              evaluating spending trends to
-              maintain alignment with your
+              We recommend reviewing your recent transaction activity and
+              evaluating spending trends to maintain alignment with your
               financial goals.
             </Text>
 
             {/* CTA */}
 
-            <Section
-              style={styles.buttonContainer}
-            >
-              <a
-                href={safeData.dashboardUrl}
-                style={styles.button}
-              >
+            <Section style={styles.buttonContainer}>
+              <a href={safeData.dashboardUrl} style={styles.button}>
                 View Dashboard
               </a>
             </Section>
-
           </Section>
 
           {/* Footer */}
 
           <Section style={styles.footer}>
             <Text style={styles.footerText}>
-              This is an automated account
-              notification from Welth.
+              This is an automated account notification from Welth.
             </Text>
 
             <Text style={styles.footerText}>
@@ -411,11 +274,9 @@ export default function EmailTemplate({
             <Hr style={styles.footerHr} />
 
             <Text style={styles.footerText}>
-              © {new Date().getFullYear()} Welth.
-              All rights reserved.
+              © {new Date().getFullYear()} Welth. All rights reserved.
             </Text>
           </Section>
-
         </Container>
       </Body>
     </Html>
@@ -557,21 +418,21 @@ const styles = {
   incomeValue: {
     fontSize: "20px",
     fontWeight: "700",
-    color: "#0f172a", 
+    color: "#0f172a",
     margin: "0",
   },
 
   expenseValue: {
     fontSize: "20px",
     fontWeight: "700",
-    color: "#0f172a",  
+    color: "#0f172a",
     margin: "0",
   },
 
   dangerValue: {
     fontSize: "18px",
     fontWeight: "600",
-    color: "#0f172a",  
+    color: "#0f172a",
     margin: "0",
   },
 

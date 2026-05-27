@@ -1,8 +1,14 @@
 // inngest/functions.ts
 import db from "@/lib/prisma";
 import { inngest } from "./client";
-import { endOfMonth, format, isSameMonth, startOfMonth, subMonths } from "date-fns";
-import { Resend } from 'resend';
+import {
+  endOfMonth,
+  format,
+  isSameMonth,
+  startOfMonth,
+  subMonths,
+} from "date-fns";
+import { Resend } from "resend";
 import EmailTemplate from "@/emails/template";
 import { GoogleGenAI } from "@google/genai";
 
@@ -38,7 +44,8 @@ export const processRecurringTransactions = inngest.createFunction(
       });
     });
 
-    if (!transaction || !isTransactionDue(transaction)) return { message: "Not due" };
+    if (!transaction || !isTransactionDue(transaction))
+      return { message: "Not due" };
 
     // 3. Database updates MUST be inside a step.run() in Inngest!
     await step.run("process-database-updates", async () => {
@@ -62,7 +69,7 @@ export const processRecurringTransactions = inngest.createFunction(
         const balanceChange =
           transaction.type === "EXPENSE"
             ? -Number(transaction.amount)
-            : Number(transaction.amount)
+            : Number(transaction.amount);
 
         await tx.account.update({
           where: { id: transaction.accountId },
@@ -76,7 +83,7 @@ export const processRecurringTransactions = inngest.createFunction(
             lastProcessed: new Date(),
             nextRecurringDate: calculateNextRecurringDate(
               new Date(),
-              transaction.recurringInterval
+              transaction.recurringInterval,
             ),
           },
         });
@@ -84,7 +91,7 @@ export const processRecurringTransactions = inngest.createFunction(
     });
 
     return { success: true };
-  }
+  },
 );
 
 // Triggerring recurring transaction with events.
@@ -94,15 +101,18 @@ export const triggerRecurringTransaction = inngest.createFunction(
     triggers: { cron: "TZ=Asia/Kolkata 0 0 * * *" },
   },
   async ({ step }) => {
-    const recurringTransactions = await step.run("fetch-recurring-transactions", async () => {
-      return await db.transaction.findMany({
-        where: {
-          isRecurring: true,
-          nextRecurringDate: { lte: new Date() },
-          status: "COMPLETED",
-        }
-      });
-    });
+    const recurringTransactions = await step.run(
+      "fetch-recurring-transactions",
+      async () => {
+        return await db.transaction.findMany({
+          where: {
+            isRecurring: true,
+            nextRecurringDate: { lte: new Date() },
+            status: "COMPLETED",
+          },
+        });
+      },
+    );
 
     // Send event for each recurring transaction in batches
     if (recurringTransactions.length > 0) {
@@ -111,8 +121,8 @@ export const triggerRecurringTransaction = inngest.createFunction(
           name: "transaction.recurring.process",
           data: {
             id: transaction.id,
-            userId: transaction.userId
-          }
+            userId: transaction.userId,
+          },
         };
       });
 
@@ -120,15 +130,15 @@ export const triggerRecurringTransaction = inngest.createFunction(
     }
 
     return { triggered: recurringTransactions.length };
-  }
+  },
 );
 
 // checking the budget alert to send the email.
 export const checkBudgetAlerts = inngest.createFunction(
-  // Configuration and trigger 
+  // Configuration and trigger
   {
     id: "check-budget-alert",
-    triggers: [{ cron: "TZ=Asia/Kolkata 0 */6 * * *" }]
+    triggers: [{ cron: "TZ=Asia/Kolkata 0 */6 * * *" }],
   },
   async ({ step }) => {
     const now = new Date();
@@ -139,7 +149,7 @@ export const checkBudgetAlerts = inngest.createFunction(
     const budgets = await step.run("fetch-budgets", async () => {
       return await db.budget.findMany({
         include: {
-          user: true
+          user: true,
         },
       });
     });
@@ -147,22 +157,25 @@ export const checkBudgetAlerts = inngest.createFunction(
     // 2. Loop safely through budgets
     for (const budget of budgets) {
       // Fetch Aggregated Expenses for this specific user
-      const totalExpense = await step.run(`calculate-expenses-${budget.userId}`, async () => {
-        return await db.transaction.aggregate({
-          where: {
-            userId: budget.userId,
-            type: "EXPENSE",
-            status: "COMPLETED",
-            date: {
-              gte: monthStart,
-              lte: monthEnd,
+      const totalExpense = await step.run(
+        `calculate-expenses-${budget.userId}`,
+        async () => {
+          return await db.transaction.aggregate({
+            where: {
+              userId: budget.userId,
+              type: "EXPENSE",
+              status: "COMPLETED",
+              date: {
+                gte: monthStart,
+                lte: monthEnd,
+              },
             },
-          },
-          _sum: {
-            amount: true,
-          },
-        });
-      });
+            _sum: {
+              amount: true,
+            },
+          });
+        },
+      );
 
       const expenseAmount = totalExpense._sum.amount
         ? totalExpense._sum.amount.toNumber()
@@ -214,34 +227,34 @@ export const checkBudgetAlerts = inngest.createFunction(
         });
       }
     }
-  }
+  },
 );
 
 // Monthly Report
 export const generateMonthlyReport = inngest.createFunction(
   {
     id: "generate-monthly-report",
-    triggers: { cron: "TZ=Asia/Kolkata 0 0 1 * *" } // for every month
+    triggers: { cron: "TZ=Asia/Kolkata 0 0 1 * *" }, // for every month
   },
   async ({ step }) => {
     const users = await step.run("fetch-all-users", async () => {
       return await db.user.findMany({
         include: {
-          account: true
-        }
-      })
-    })
+          account: true,
+        },
+      });
+    });
 
     for (const user of users) {
       await step.run(`generate-report-${user.id}`, async () => {
-        const now = new Date()
-        const lastMonth = subMonths(now, 1)
-        const fullMonthName = format(lastMonth, "MMMM")
+        const now = new Date();
+        const lastMonth = subMonths(now, 1);
+        const fullMonthName = format(lastMonth, "MMMM");
 
-        const stats = await getUsersMonthlyStats(user.id, lastMonth)
+        const stats = await getUsersMonthlyStats(user.id, lastMonth);
 
         // Generate AI insights
-        const insights = await generateFinancialInsights(stats, fullMonthName)
+        const insights = await generateFinancialInsights(stats, fullMonthName);
 
         const resend = new Resend(process.env.RESEND_API_KEY);
         const { error } = await resend.emails.send({
@@ -255,7 +268,7 @@ export const generateMonthlyReport = inngest.createFunction(
               stats,
               month: fullMonthName,
               insights,
-              dashboardUrl: "http://localhost:3000/dashboard"
+              dashboardUrl: "http://localhost:3000/dashboard",
             },
           }),
         });
@@ -263,16 +276,16 @@ export const generateMonthlyReport = inngest.createFunction(
         if (error) {
           throw new Error(error.message);
         }
-      })
+      });
     }
 
     return { processed: users.length };
-  }
-)
+  },
+);
 
 const getUsersMonthlyStats = async (userId, month) => {
-  const startDate = startOfMonth(month)
-  const endDate = endOfMonth(month)
+  const startDate = startOfMonth(month);
+  const endDate = endOfMonth(month);
 
   const transactions = await db.transaction.findMany({
     where: {
@@ -280,29 +293,30 @@ const getUsersMonthlyStats = async (userId, month) => {
       date: {
         gte: startDate,
         lte: endDate,
-      }
-    }
-  })
+      },
+    },
+  });
 
-  return transactions.reduce((stats, t) => {
-    const amount = t.amount.toNumber()
-    if (t.type === "EXPENSE") {
-      stats.totalExpenses += amount
-      stats.byCategory[t.category] = (stats.byCategory[t.category] || 0) + amount
-    }
-    else {
-      stats.totalIncome += amount
-    }
-    return stats
-  },
+  return transactions.reduce(
+    (stats, t) => {
+      const amount = t.amount.toNumber();
+      if (t.type === "EXPENSE") {
+        stats.totalExpenses += amount;
+        stats.byCategory[t.category] =
+          (stats.byCategory[t.category] || 0) + amount;
+      } else {
+        stats.totalIncome += amount;
+      }
+      return stats;
+    },
     {
       totalExpenses: 0,
       totalIncome: 0,
       byCategory: {},
       transactionCount: transactions.length,
-    }
-  )
-}
+    },
+  );
+};
 
 const generateFinancialInsights = async (stats, month) => {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY_NEW });
@@ -330,7 +344,7 @@ const generateFinancialInsights = async (stats, month) => {
       contents: [prompt],
       config: {
         responseMimeType: "application/json",
-      }
+      },
     });
 
     const rawText = response.text;
@@ -345,7 +359,7 @@ const generateFinancialInsights = async (stats, month) => {
       "Track your recurring expenses to identify potential savings.",
     ];
   }
-}
+};
 
 function isTransactionDue(transaction) {
   // If no lastProcessed date, transaction is due
@@ -376,5 +390,3 @@ function calculateNextRecurringDate(date, interval) {
   }
   return next;
 }
-
-

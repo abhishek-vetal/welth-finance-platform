@@ -43,9 +43,15 @@ function getRandomCategory(type) {
 // 3% chance a transaction is recurring
 function getRecurringDetails(date) {
   const isRecurring = Math.random() < 0.03;
-  if (!isRecurring) return { isRecurring: false, recurringInterval: null, nextRecurringDate: null };
+  if (!isRecurring)
+    return {
+      isRecurring: false,
+      recurringInterval: null,
+      nextRecurringDate: null,
+    };
 
-  const interval = RECURRING_INTERVALS[Math.floor(Math.random() * RECURRING_INTERVALS.length)];
+  const interval =
+    RECURRING_INTERVALS[Math.floor(Math.random() * RECURRING_INTERVALS.length)];
 
   // Calculate next recurring date based on interval
   const nextDate = new Date(date);
@@ -64,7 +70,11 @@ function getRecurringDetails(date) {
       break;
   }
 
-  return { isRecurring: true, recurringInterval: interval, nextRecurringDate: nextDate };
+  return {
+    isRecurring: true,
+    recurringInterval: interval,
+    nextRecurringDate: nextDate,
+  };
 }
 
 export async function seedTransactions() {
@@ -79,7 +89,8 @@ export async function seedTransactions() {
       for (let j = 0; j < transactionsPerDay; j++) {
         const type = Math.random() < 0.4 ? "INCOME" : "EXPENSE";
         const { category, amount } = getRandomCategory(type);
-        const { isRecurring, recurringInterval, nextRecurringDate } = getRecurringDetails(date);
+        const { isRecurring, recurringInterval, nextRecurringDate } =
+          getRecurringDetails(date);
 
         const transaction = {
           id: crypto.randomUUID(),

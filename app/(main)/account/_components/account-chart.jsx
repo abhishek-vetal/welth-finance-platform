@@ -1,6 +1,14 @@
-"use client"
+"use client";
 
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -8,8 +16,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import { endOfDay, format, setDate, startOfDay, subDays } from "date-fns";
+import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { useMemo, useState } from "react";
 // 1. Added ResponsiveContainer to the imports
 import {
@@ -20,7 +29,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
 } from "recharts";
 
 const DATE_RANGES = {
@@ -32,92 +41,152 @@ const DATE_RANGES = {
 };
 
 export default function AccountChart({ transactions }) {
-
   const [dateRange, setDateRange] = useState("1M");
 
   const filteredData = useMemo(() => {
-    const range = DATE_RANGES[dateRange]
-    const now = new Date()
+    const range = DATE_RANGES[dateRange];
+    const now = new Date();
     const startDate = range.days
       ? startOfDay(subDays(now, range.days))
       : startOfDay(new Date(0));
 
     const filtered = transactions.filter((t) => {
-      return new Date(t.date) >= startDate && new Date(t.date) <= endOfDay(now)
-    })
+      return new Date(t.date) >= startDate && new Date(t.date) <= endOfDay(now);
+    });
 
     const grouped = filtered.reduce((acc, transaction) => {
-      const date = format(new Date(transaction.date), "MMM dd")
+      const date = format(new Date(transaction.date), "MMM dd");
 
       if (!acc[date]) {
-        acc[date] = { date, Income: 0, Expense: 0 }
+        acc[date] = { date, Income: 0, Expense: 0 };
       }
 
       transaction.type === "INCOME"
-        ? acc[date].Income += transaction.amount
-        : acc[date].Expense += transaction.amount
+        ? (acc[date].Income += transaction.amount)
+        : (acc[date].Expense += transaction.amount);
 
-      return acc
-    }, {})
+      return acc;
+    }, {});
 
-    return Object.values(grouped).sort((a, b) => new Date(a.date) - new Date(b.date))
-
-  }, [transactions, dateRange])
+    return Object.values(grouped).sort(
+      (a, b) => new Date(a.date) - new Date(b.date),
+    );
+  }, [transactions, dateRange]);
 
   const totals = useMemo(() => {
-    return filteredData.reduce((acc, day) => {
-      acc.Income += day.Income
-      acc.Expense += day.Expense
+    return filteredData.reduce(
+      (acc, day) => {
+        acc.Income += day.Income;
+        acc.Expense += day.Expense;
 
-      return acc
-    }, { Income: 0, Expense: 0 })
-  }, [filteredData])
+        return acc;
+      },
+      { Income: 0, Expense: 0 },
+    );
+  }, [filteredData]);
 
   const netTotal = useMemo(() => {
-    return totals.Income - totals.Expense
-  }, [totals])
-
+    return totals.Income - totals.Expense;
+  }, [totals]);
 
   return (
+    <Card className="rounded-3xl bg-card shadow-sm transition-all duration-300 hover:shadow-xl">
+      <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <CardTitle className="text-2xl font-bold tracking-tight">
+            Transaction Overview
+          </CardTitle>
 
-    <Card>
-      <CardHeader>
-        <CardTitle>Transaction Overview</CardTitle>
+          <CardDescription className="mt-1 text-sm text-muted-foreground">
+            Income vs expenses across selected period
+          </CardDescription>
+        </div>
+
         <CardAction>
           <Select
             value={dateRange}
             onValueChange={(value) => setDateRange(value)}
           >
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-40 rounded-xl">
               <SelectValue placeholder="Select Range" />
             </SelectTrigger>
+
             <SelectContent>
               <SelectGroup>
-                {Object.entries(DATE_RANGES).map(([key, { label }]) => {
-                  return <SelectItem key={key} value={key}>{label}</SelectItem>
-                })}
+                {Object.entries(DATE_RANGES).map(([key, { label }]) => (
+                  <SelectItem key={key} value={key}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>
         </CardAction>
       </CardHeader>
+
       <CardContent>
-        <div className="flex justify-evenly">
-          <div className="flex flex-col items-center">
-            <p className="text-muted-foreground">Total Income</p>
-            <p className={"font-bold text-green-500"}>{`₹${totals.Income.toFixed(2)}`}</p>
+        {/* Statistics cards */}
+        <div className="mb-8 grid gap-4 md:grid-cols-3">
+          <div className="relative overflow-hidden rounded-2xl bg-card p-5 shadow-sm">
+            <div className="absolute -top-6 -right-6 h-20 w-20 rounded-full bg-green-500/10 blur-2xl" />
+
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Income</p>
+
+                <p className="mt-2 text-xl font-bold text-green-500">
+                  ₹{totals.Income.toFixed(2)}
+                </p>
+              </div>
+
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-500/10">
+                <ArrowUpRight className="h-5 w-5 text-green-500" />
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col items-center">
-            <p className="text-muted-foreground">Total Expense</p>
-            <p className={"font-bold text-red-500"}>{`₹${totals.Expense.toFixed(2)}`}</p>
+
+          <div className="relative overflow-hidden rounded-2xl bg-card p-5 shadow-sm">
+            <div className="absolute -top-6 -right-6 h-20 w-20 rounded-full bg-red-500/10 blur-2xl" />
+
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Expense</p>
+
+                <p className="mt-2 text-xl font-bold text-red-500">
+                  ₹{totals.Expense.toFixed(2)}
+                </p>
+              </div>
+
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-500/10">
+                <ArrowDownRight className="h-5 w-5 text-red-500" />
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col items-center">
-            <p className="text-muted-foreground">Net</p>
-            <p className={`font-bold ${netTotal > 0 ? "text-green-500" : "text-red-500"}`}>
-              {`₹${netTotal.toFixed(2)}`}
-            </p>
+
+          <div className="relative overflow-hidden rounded-2xl bg-card p-5 shadow-sm">
+            <div className="absolute -top-6 -right-6 h-20 w-20 rounded-full bg-primary/10 blur-2xl" />
+
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Net Balance</p>
+
+                <p
+                  className={`mt-2 text-xl font-bold ${
+                    netTotal >= 0 ? "text-green-500" : "text-red-500"
+                  }`}
+                >
+                  ₹{netTotal.toFixed(2)}
+                </p>
+              </div>
+
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+                <span className="text-lg font-bold">₹</span>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Chart */}
         <div className="h-80 w-full">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart
@@ -129,8 +198,11 @@ export default function AccountChart({ transactions }) {
                 bottom: 5,
               }}
             >
-              {/* Cleaned up grid: Hiding vertical lines looks much cleaner in dashboards */}
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                opacity={0.3}
+              />
 
               <XAxis
                 dataKey="date"
@@ -138,6 +210,7 @@ export default function AccountChart({ transactions }) {
                 tickLine={false}
                 axisLine={false}
               />
+
               <YAxis
                 fontSize={12}
                 tickLine={false}
@@ -147,18 +220,23 @@ export default function AccountChart({ transactions }) {
               />
 
               <Tooltip
-                cursor={{ fill: 'rgba(0, 0, 0, 0.04)' }}
-                formatter={(value) => [`₹${value}`, undefined]}
+                cursor={{
+                  fill: "rgba(255,255,255,0.03)",
+                }}
+                formatter={(value, name) => {
+                  return [`₹${Number(value).toFixed(2)}`, name];
+                }}
               />
+
               <Legend />
 
-              {/* Slightly reduced radius to 4px so bars don't look like long capsules */}
-              <Bar dataKey="Income" fill="#22c55e" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="Expense" fill="#ef4444" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Income" fill="#22c55e" radius={[6, 6, 0, 0]} />
+
+              <Bar dataKey="Expense" fill="#ef4444" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

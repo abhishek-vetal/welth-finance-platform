@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Moon } from "lucide-react"
-import { useTheme } from "next-themes"
+import * as React from "react";
+import { Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = React.useState(false)
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
 
   // Prevent hydration flicker on initial load
   React.useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
     return (
       <div className="h-9 w-9 rounded-md border border-input bg-background/50 backdrop-blur-sm" />
-    )
+    );
   }
 
   const toggleTheme = () => {
-    setTheme(resolvedTheme === "light" ? "dark" : "light")
-  }
+    setTheme(resolvedTheme === "light" ? "dark" : "light");
+  };
 
   return (
     <button
@@ -33,5 +33,5 @@ export function ThemeToggle() {
       <Moon className="h-[1.2rem] w-[1.2rem] text-purple-600" />
       <span className="sr-only">Toggle theme</span>
     </button>
-  )
+  );
 }

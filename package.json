@@ -1,13 +1,14 @@
 {
-  "name": "welth",
+  "name": "welth-finance-platform",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "inngest": "npx inngest-cli@latest dev"
+    "inngest": "npx inngest-cli@latest dev",
+    "lint": "next lint",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@arcjet/next": "^1.4.0",
@@ -21,6 +22,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "inngest": "^4.4.0",
     "lucide-react": "^1.14.0",
     "next": "16.2.4",
     "next-themes": "^0.4.6",

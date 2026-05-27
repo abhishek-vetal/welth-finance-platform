@@ -8,8 +8,7 @@ import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 export default function ReceiptScanner({ onScanComplete }) {
-
-  const fileInputRef = useRef(null)
+  const fileInputRef = useRef(null);
 
   const {
     data: scannedData,
@@ -18,31 +17,29 @@ export default function ReceiptScanner({ onScanComplete }) {
   } = useFetch(scanReceipt);
 
   const handleReceiptScan = async (event) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+    const file = event.target.files?.[0];
+    if (!file) return;
 
     // Make sure they actually uploaded an image with file size > 5MB
     if (!file.type.includes("image")) {
-      toast.error("Please upload an image file.")
-      return
-    }
-    else if (file.size > 5 * 1024 * 1024) {
-      toast.error("Please enter file of size less than 5MB")
-      return
+      toast.error("Please upload an image file.");
+      return;
+    } else if (file.size > 5 * 1024 * 1024) {
+      toast.error("Please enter file of size less than 5MB");
+      return;
     }
 
     const formData = new FormData();
     formData.append("receipt", file);
 
     await scanReceiptFn(formData);
-
-  }
+  };
 
   useEffect(() => {
     if (scannedData && !scanReceiptLoading) {
       if (!scannedData.success) {
-        toast.error("Failed to process image")
-        return
+        toast.error("Failed to process image");
+        return;
       }
       onScanComplete(scannedData);
       toast.success("Receipt scanned successfully");
@@ -51,14 +48,11 @@ export default function ReceiptScanner({ onScanComplete }) {
 
   return (
     <div className="relative overflow-hidden rounded-2xl border bg-card p-4 shadow-sm transition-all hover:shadow-md">
-
       <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-primary/10 blur-3xl" />
 
       <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-
         {/* Left section */}
         <div className="flex items-start gap-3">
-
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 border">
             <Receipt className="h-5 w-5 text-primary" />
           </div>
@@ -69,7 +63,8 @@ export default function ReceiptScanner({ onScanComplete }) {
             </h3>
 
             <p className="text-xs text-muted-foreground max-w-sm leading-relaxed">
-              Upload a receipt and let AI extract amount, date, and category automatically.
+              Upload a receipt and let AI extract amount, date, and category
+              automatically.
             </p>
 
             <div className="flex flex-wrap gap-1.5 pt-1">
@@ -117,5 +112,5 @@ export default function ReceiptScanner({ onScanComplete }) {
         </Button>
       </div>
     </div>
-  )
+  );
 }

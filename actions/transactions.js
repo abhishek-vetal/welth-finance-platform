@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import aj from "@/lib/arcjet";
 import { request } from "@arcjet/next";
@@ -17,19 +17,18 @@ const serializeAmount = (obj) => ({
 
 export async function createTransactions(data) {
   try {
-    const { userId } = await auth()
-    if (!userId) throw new Error("Unauthorized")
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId }
-    })
-    if (!user) throw new Error("User not found")
+      where: { clerkUserId: userId },
+    });
+    if (!user) throw new Error("User not found");
 
     // Arcjet Tranasactions rate limiting not using cause plan upgrade required.
 
-    // request() is used to extract the details from the req 
+    // request() is used to extract the details from the req
     // const req = await request()
-    
 
     // const decision = await aj.protect(req, { userId, requested: 1 });
 
@@ -43,18 +42,17 @@ export async function createTransactions(data) {
     //   throw new Error("Request blocked for security reasons.");
     // }
 
-
-    const MAX_REQUESTS = 10
-    const oneHourAgo = subHours(new Date(), 1)
+    const MAX_REQUESTS = 10;
+    const oneHourAgo = subHours(new Date(), 1);
 
     const recentTransactionsCount = await db.transaction.count({
       where: {
         userId: user.id,
         createdAt: {
           gte: oneHourAgo,
-        }
-      }
-    })
+        },
+      },
+    });
 
     if (recentTransactionsCount >= MAX_REQUESTS) {
       throw new Error("Rate limit exceeded. Maximum 10 transactions per hour.");
@@ -101,9 +99,8 @@ export async function createTransactions(data) {
     revalidatePath(`/account/${data.accountId}`);
 
     return { success: true, data: serializeAmount(transaction) };
-
   } catch (error) {
-    return { success: false, error: error.message }
+    return { success: false, error: error.message };
   }
 }
 
@@ -140,7 +137,7 @@ export async function scanReceipt(formData) {
 
     // 2. THE GEMINI DOCS METHOD: Convert File to Buffer to Base64
     const arrayBuffer = await file.arrayBuffer();
-    const base64Image = Buffer.from(arrayBuffer).toString('base64');
+    const base64Image = Buffer.from(arrayBuffer).toString("base64");
 
     const prompt = `
       Analyze this receipt image and extract the following information in JSON format:
@@ -175,7 +172,7 @@ export async function scanReceipt(formData) {
       ],
       config: {
         responseMimeType: "application/json",
-      }
+      },
     });
 
     try {
@@ -187,7 +184,7 @@ export async function scanReceipt(formData) {
         throw new Error("Could not recognize this image as a valid receipt.");
       }
 
-      console.log("Gemini response:", receiptData)
+      console.log("Gemini response:", receiptData);
 
       return {
         success: true,
@@ -201,37 +198,39 @@ export async function scanReceipt(formData) {
           description: receiptData.description || "",
           category: receiptData.category || "other-expense",
           merchantName: receiptData.merchantName || "",
-        }
-      }
+        },
+      };
     } catch (parseError) {
       console.error("Error parsing Gemini response:", parseError);
-      return { success: false, error: "Failed to extract data from this receipt." };
+      return {
+        success: false,
+        error: "Failed to extract data from this receipt.",
+      };
     }
-
   } catch (error) {
     console.error("Error scanning receipt:", error);
-    return { success: false, error: error.message }
+    return { success: false, error: error.message };
   }
 }
 
 export async function getTransaction(id) {
-    const { userId } = await auth()
-    if (!userId) throw new Error("Unauthorized")
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId }
-    })
-    if (!user) throw new Error("User not found")
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+  if (!user) throw new Error("User not found");
 
-    const transaction = await db.transaction.findUnique({
-      where: {
-        id,
-        userId: user.id,
-      }
-    })
-    if (!transaction) throw new Error("Transaction not found")
+  const transaction = await db.transaction.findUnique({
+    where: {
+      id,
+      userId: user.id,
+    },
+  });
+  if (!transaction) throw new Error("Transaction not found");
 
-    return serializeAmount(transaction) 
+  return serializeAmount(transaction);
 }
 
 export async function updateTransaction(id, data) {
@@ -303,6 +302,6 @@ export async function updateTransaction(id, data) {
 
     return { success: true, data: serializeAmount(transaction) };
   } catch (error) {
-    return {success: false, error: error.message}
+    return { success: false, error: error.message };
   }
 }
