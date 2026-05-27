@@ -4,6 +4,7 @@ import Image from "next/image"
 import { Button } from '@/components/ui/button'
 import { LuLayoutDashboard } from "react-icons/lu";
 import { FaPenToSquare } from "react-icons/fa6";
+import { ThemeToggle } from './theme-toggle';
 
 export default function Header() {
   return (
@@ -14,11 +15,19 @@ export default function Header() {
 
           {/* Logo */}
           <Link href="/">
-            <Image src="/logo.png" alt="welth logo" width={100} height={50} />
+            <Image
+              src="/logo.png"
+              alt="Welth Logo"
+              width={200} 
+              height={50}
+              className="w-30 h-auto" 
+            />
           </Link>
 
           {/* Right side */}
           <div className="flex items-center gap-3">
+
+            <ThemeToggle />
 
             <Show when="signed-in">
               <Link href="/dashboard">
